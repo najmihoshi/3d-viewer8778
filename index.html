@@ -3,631 +3,271 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Page With 3D Viewer</title>
+  <title>3D Viewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
-  <!-- ═══════════════════════════════════════════════════════════════
-       YOUR PAGE STYLES GO HERE
-       This is just a demo page wrapper — replace with your own.
-  ════════════════════════════════════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════════════════════
+       YOUR PAGE STYLES
+  ════════════════════════════════════════════════════════ -->
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      margin: 0;
-      font-family: sans-serif;
-      background: #0a0a0a;
-      color: #fff;
-      padding: 40px 20px;
+      background: #04080f;
+      color: #e2eeff;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 40px 24px;
+      min-height: 100vh;
     }
 
-    h1 { text-align: center; margin-bottom: 10px; font-size: 1.4rem; }
-    p  { text-align: center; color: #888; margin-bottom: 32px; font-size: 0.9rem; }
+    .page-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #e2eeff;
+      text-align: center;
+      margin-bottom: 6px;
+    }
 
-    /* ── The viewer sits inside this wrapper div on your page ── */
-    /* Give it any width/height you want */
-    .my-viewer-wrapper {
-      width: 100%;
-      max-width: 1100px;
-      height: 600px;       /* ← change this to control height */
+    .page-title span { color: #00d4ff; }
+
+    .page-sub {
+      text-align: center;
+      font-size: 0.6rem;
+      color: #344d72;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+    }
+
+    /* Grid layout for multiple viewers */
+    .viewer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+      gap: 24px;
+      max-width: 1400px;
       margin: 0 auto;
-      border-radius: 8px;
+    }
+
+    /* Each viewer lives in a wrapper — set the size here */
+    .viewer-slot {
+      height: 520px;
+      border-radius: 4px;
       overflow: hidden;
     }
   </style>
 </head>
 <body>
 
-  <h1>My Product Page</h1>
-  <p>Drop the viewer anywhere on your page by pasting the segment below.</p>
+  <div class="page-title">3D Model <span>Gallery</span></div>
+  <div class="page-sub">// Interactive Tech Preview System</div>
 
-  <!-- ═══════════════════════════════════════════════════════════════
-    ✂  CUT EVERYTHING BETWEEN THESE LINES AND PASTE INTO YOUR PAGE
-  ════════════════════════════════════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════════════════════
+    HOW TO USE:
+    1. Add a <div class="viewer-slot" id="viewer-A"></div>
+       for each model you want to show.
+    2. At the bottom, call createViewer({ ... }) once per model.
+    3. Set objFile, title, tag, and parts to match your model.
+  ════════════════════════════════════════════════════════ -->
 
-  <!-- STEP 1 — Paste this wrapper div wherever you want the viewer -->
-  <div class="my-viewer-wrapper">
+  <div class="viewer-grid">
 
-    <!-- STEP 2 — This is the viewer segment. Paste this ONCE anywhere in your HTML.
-         It is fully self-contained: styles are scoped, JS is isolated. -->
-    <div id="mv3d-root">
+    <!-- Viewer 1 — Football Helmet -->
+    <div class="viewer-slot" id="viewer-A"></div>
 
-      <!-- ── Scoped styles: all rules are prefixed with #mv3d-root ── -->
-      <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap');
+    <!-- Viewer 2 — second model (swap objFile + parts) -->
+    <div class="viewer-slot" id="viewer-B"></div>
 
-        /* All selectors scoped to #mv3d-root so they never leak to your page */
+    <!-- Add more viewers: <div class="viewer-slot" id="viewer-C"></div> -->
 
-        #mv3d-root {
-          --mv-bg:         #020810;
-          --mv-surface:    #060f1e;
-          --mv-surface2:   #0a1628;
-          --mv-surface3:   #0d1f38;
-          --mv-border:     #0e2040;
-          --mv-border2:    #1a3a6a;
-          --mv-accent:     #0a84ff;
-          --mv-accent2:    #00d4ff;
-          --mv-text:       #e2eeff;
-          --mv-text2:      #6b8ab5;
-          --mv-text3:      #344d72;
-          --mv-glow-sm:    0 0 12px rgba(10,132,255,0.35);
-          --mv-glow-md:    0 0 24px rgba(10,132,255,0.25), 0 0 60px rgba(10,132,255,0.1);
-          --mv-shadow:     0 24px 80px rgba(0,0,0,0.7);
-          --mv-grid:       rgba(10,132,255,0.07);
-          --mv-radius:     2px;
+  </div>
 
-          width: 100%;
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-          font-family: 'JetBrains Mono', monospace;
-          font-weight: 300;
-          background: var(--mv-bg);
-          color: var(--mv-text);
-          overflow: hidden;
-          position: relative;
-        }
 
-        /* ── Header ── */
-        #mv3d-root .mv-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 24px;
-          height: 52px;
-          flex-shrink: 0;
-          background: var(--mv-surface);
-          border-bottom: 1px solid var(--mv-border2);
-          position: relative;
-          z-index: 10;
-        }
-
-        #mv3d-root .mv-header::before {
-          content: '';
-          position: absolute;
-          top: 0; left: 0; right: 0; height: 2px;
-          background: linear-gradient(90deg, transparent, var(--mv-accent), var(--mv-accent2), var(--mv-accent), transparent);
-        }
-
-        #mv3d-root .mv-logo {
-          font-family: 'Rajdhani', sans-serif;
-          font-weight: 700;
-          font-size: 1.05rem;
-          letter-spacing: 0.2em;
-          text-transform: uppercase;
-          color: var(--mv-text);
-          display: flex;
-          align-items: center;
-          gap: 9px;
-        }
-
-        #mv3d-root .mv-logo-dot {
-          width: 6px; height: 6px;
-          background: var(--mv-accent);
-          border-radius: 50%;
-          box-shadow: var(--mv-glow-sm);
-          animation: mv-blink 2.4s ease-in-out infinite;
-        }
-
-        @keyframes mv-blink {
-          0%,90%,100% { opacity:1; } 95% { opacity:0.2; }
-        }
-
-        #mv3d-root .mv-model-label {
-          font-size: 0.6rem;
-          color: var(--mv-text3);
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-        }
-
-        #mv3d-root .mv-model-label span { color: var(--mv-accent2); }
-
-        #mv3d-root .mv-header-btns { display: flex; gap: 6px; }
-
-        #mv3d-root .mv-btn {
-          background: transparent;
-          border: 1px solid var(--mv-border2);
-          color: var(--mv-text2);
-          padding: 4px 12px;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.58rem;
-          cursor: pointer;
-          text-transform: uppercase;
-          letter-spacing: 0.1em;
-          border-radius: var(--mv-radius);
-          transition: all 0.15s;
-        }
-
-        #mv3d-root .mv-btn:hover  { border-color: var(--mv-accent); color: var(--mv-accent2); box-shadow: var(--mv-glow-sm); }
-        #mv3d-root .mv-btn.active { background: rgba(10,132,255,0.12); border-color: var(--mv-accent); color: var(--mv-accent2); }
-
-        /* ── Viewer area ── */
-        #mv3d-root .mv-viewer {
-          flex: 1;
-          display: flex;
-          position: relative;
-          overflow: hidden;
-        }
-
-        #mv3d-root .mv-viewer::after {
-          content: '';
-          position: absolute; inset: 0;
-          background-image:
-            linear-gradient(var(--mv-grid) 1px, transparent 1px),
-            linear-gradient(90deg, var(--mv-grid) 1px, transparent 1px);
-          background-size: 44px 44px;
-          pointer-events: none;
-          z-index: 0;
-        }
-
-        #mv3d-root .mv-viewer::before {
-          content: '';
-          position: absolute; inset: 0;
-          background:
-            radial-gradient(ellipse 65% 65% at 42% 50%, rgba(10,132,255,0.06) 0%, transparent 70%),
-            radial-gradient(ellipse 100% 100% at 50% 50%, transparent 55%, rgba(2,8,16,0.8) 100%);
-          pointer-events: none;
-          z-index: 1;
-        }
-
-        #mv3d-root .mv-canvas {
-          display: block;
-          width: 100%;
-          height: 100%;
-          cursor: grab;
-          position: relative;
-          z-index: 2;
-        }
-
-        #mv3d-root .mv-canvas:active { cursor: grabbing; }
-
-        /* ── Scanline sweep ── */
-        #mv3d-root .mv-scanline {
-          position: absolute;
-          left: 0; width: calc(100% - 260px); height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(10,132,255,0.35), transparent);
-          pointer-events: none; z-index: 3; opacity: 0.5;
-          animation: mv-scan 6s linear infinite;
-        }
-
-        @keyframes mv-scan {
-          0%   { top: 0%;   opacity: 0; }
-          5%   { opacity: 0.5; }
-          95%  { opacity: 0.5; }
-          100% { top: 100%; opacity: 0; }
-        }
-
-        /* ── Corner brackets ── */
-        #mv3d-root .mv-corner {
-          position: absolute; width: 16px; height: 16px;
-          pointer-events: none; z-index: 3;
-        }
-        #mv3d-root .mv-corner.tl { top:7px; left:7px;   border-top:1px solid var(--mv-accent); border-left:1px solid var(--mv-accent); }
-        #mv3d-root .mv-corner.tr { top:7px; right:267px; border-top:1px solid var(--mv-accent); border-right:1px solid var(--mv-accent); }
-        #mv3d-root .mv-corner.bl { bottom:7px; left:7px;   border-bottom:1px solid var(--mv-accent); border-left:1px solid var(--mv-accent); }
-        #mv3d-root .mv-corner.br { bottom:7px; right:267px; border-bottom:1px solid var(--mv-accent); border-right:1px solid var(--mv-accent); }
-
-        /* ── HUD ── */
-        #mv3d-root .mv-hud {
-          position: absolute; top: 16px; left: 16px;
-          pointer-events: none; z-index: 5;
-        }
-
-        #mv3d-root .mv-hud-label {
-          font-size: 0.5rem; color: var(--mv-text3);
-          text-transform: uppercase; letter-spacing: 0.14em;
-          line-height: 2; font-weight: 300;
-        }
-
-        #mv3d-root .mv-hud-value {
-          font-size: 0.62rem; color: var(--mv-accent2); font-weight: 400;
-        }
-
-        /* ── Zoom controls ── */
-        #mv3d-root .mv-zoom {
-          position: absolute; left: 16px; bottom: 20px;
-          display: flex; gap: 4px; z-index: 5;
-        }
-
-        #mv3d-root .mv-zoom-btn {
-          width: 30px; height: 30px;
-          background: var(--mv-surface); border: 1px solid var(--mv-border2);
-          color: var(--mv-text2); font-size: 0.95rem; cursor: pointer;
-          display: flex; align-items: center; justify-content: center;
-          border-radius: var(--mv-radius); transition: all 0.15s;
-          font-family: 'JetBrains Mono', monospace;
-        }
-
-        #mv3d-root .mv-zoom-btn:hover { border-color: var(--mv-accent); color: var(--mv-accent2); box-shadow: var(--mv-glow-sm); }
-
-        /* ── Sidebar ── */
-        #mv3d-root .mv-sidebar {
-          position: absolute; right: 0; top: 0; bottom: 0; width: 260px;
-          background: var(--mv-surface);
-          border-left: 1px solid var(--mv-border2);
-          display: flex; flex-direction: column;
-          z-index: 5; overflow-y: auto;
-        }
-
-        #mv3d-root .mv-sidebar::before {
-          content: '';
-          position: absolute; top:0; left:-1px; bottom:0; width:1px;
-          background: linear-gradient(180deg, transparent, var(--mv-accent), var(--mv-accent2), var(--mv-accent), transparent);
-        }
-
-        #mv3d-root .mv-sb-head {
-          padding: 22px 20px 18px;
-          border-bottom: 1px solid var(--mv-border);
-        }
-
-        #mv3d-root .mv-sb-tag {
-          font-size: 0.55rem; font-weight: 500; letter-spacing: 0.22em;
-          text-transform: uppercase; color: var(--mv-accent);
-          margin-bottom: 9px; display: flex; align-items: center; gap: 8px;
-        }
-
-        #mv3d-root .mv-sb-tag::before {
-          content: ''; display: inline-block;
-          width: 12px; height: 1px;
-          background: var(--mv-accent); box-shadow: var(--mv-glow-sm);
-        }
-
-        #mv3d-root .mv-sb-title {
-          font-family: 'Rajdhani', sans-serif;
-          font-size: 1.7rem; font-weight: 700;
-          color: var(--mv-text); line-height: 1.1;
-          letter-spacing: 0.04em; text-transform: uppercase;
-        }
-
-        #mv3d-root .mv-sb-title span { color: var(--mv-accent2); }
-
-        #mv3d-root .mv-sb-sub {
-          font-size: 0.58rem; color: var(--mv-text3);
-          margin-top: 7px; letter-spacing: 0.08em;
-        }
-
-        #mv3d-root .mv-sb-section {
-          padding: 16px 20px;
-          border-bottom: 1px solid var(--mv-border);
-        }
-
-        #mv3d-root .mv-sb-section-label {
-          font-size: 0.52rem; font-weight: 500; letter-spacing: 0.2em;
-          text-transform: uppercase; color: var(--mv-text3);
-          margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
-        }
-
-        #mv3d-root .mv-sb-section-label::after {
-          content: ''; flex: 1; height: 1px; background: var(--mv-border);
-        }
-
-        #mv3d-root .mv-part-item {
-          display: flex; align-items: center; gap: 9px;
-          padding: 7px 9px; cursor: pointer;
-          border-radius: var(--mv-radius);
-          border: 1px solid transparent;
-          transition: all 0.15s; margin-bottom: 3px;
-        }
-
-        #mv3d-root .mv-part-item:hover { background: var(--mv-surface3); border-color: var(--mv-border2); }
-
-        #mv3d-root .mv-part-item.selected {
-          background: rgba(10,132,255,0.1);
-          border-color: var(--mv-accent);
-        }
-
-        #mv3d-root .mv-part-item.selected .mv-part-name { color: var(--mv-accent2); }
-
-        #mv3d-root .mv-part-dot {
-          width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
-        }
-
-        #mv3d-root .mv-part-name {
-          font-size: 0.65rem; font-weight: 400; color: var(--mv-text);
-          letter-spacing: 0.06em; text-transform: uppercase;
-        }
-
-        #mv3d-root .mv-sb-controls {
-          padding: 16px 20px;
-          display: flex; flex-direction: column; gap: 6px;
-        }
-
-        #mv3d-root .mv-ctrl-btn {
-          display: flex; align-items: center; gap: 9px;
-          padding: 8px 12px;
-          background: var(--mv-surface2); border: 1px solid var(--mv-border2);
-          border-radius: var(--mv-radius); cursor: pointer;
-          font-family: 'JetBrains Mono', monospace;
-          font-size: 0.58rem; font-weight: 300; color: var(--mv-text2);
-          letter-spacing: 0.08em; text-transform: uppercase;
-          transition: all 0.15s; text-align: left;
-        }
-
-        #mv3d-root .mv-ctrl-btn:hover  { border-color: var(--mv-accent); color: var(--mv-accent2); box-shadow: var(--mv-glow-sm); }
-        #mv3d-root .mv-ctrl-btn.active { background: rgba(10,132,255,0.12); border-color: var(--mv-accent); color: var(--mv-accent2); }
-        #mv3d-root .mv-ctrl-icon       { font-size: 0.85rem; color: var(--mv-accent); flex-shrink: 0; }
-
-        #mv3d-root .mv-sb-footer {
-          margin-top: auto; padding: 14px 20px;
-          border-top: 1px solid var(--mv-border);
-        }
-
-        #mv3d-root .mv-hint-row {
-          display: flex; justify-content: space-between;
-          align-items: center; padding: 3px 0;
-        }
-
-        #mv3d-root .mv-hint-label { font-size: 0.52rem; color: var(--mv-text3); letter-spacing: 0.1em; text-transform: uppercase; }
-        #mv3d-root .mv-hint-val   { font-size: 0.55rem; color: var(--mv-text2); font-weight: 400; }
-
-        /* ── Info popup ── */
-        #mv3d-root .mv-popup {
-          position: absolute;
-          background: var(--mv-surface);
-          border: 1px solid var(--mv-accent);
-          padding: 18px; width: 255px;
-          pointer-events: all;
-          box-shadow: var(--mv-glow-md), var(--mv-shadow);
-          border-radius: var(--mv-radius);
-          transition: all 0.2s cubic-bezier(0.16,1,0.3,1);
-          z-index: 100;
-          clip-path: polygon(0 0, calc(100% - 13px) 0, 100% 13px, 100% 100%, 0 100%);
-        }
-
-        #mv3d-root .mv-popup.hidden {
-          opacity: 0; transform: scale(0.94) translateY(8px); pointer-events: none;
-        }
-
-        #mv3d-root .mv-popup-hdr {
-          display: flex; justify-content: space-between;
-          align-items: flex-start; margin-bottom: 12px;
-        }
-
-        #mv3d-root .mv-popup-tag {
-          font-size: 0.52rem; font-weight: 500;
-          letter-spacing: 0.2em; text-transform: uppercase;
-          color: var(--mv-accent); margin-bottom: 5px;
-        }
-
-        #mv3d-root .mv-popup-name {
-          font-family: 'Rajdhani', sans-serif;
-          font-weight: 700; font-size: 1.2rem;
-          color: var(--mv-text); letter-spacing: 0.06em;
-          text-transform: uppercase; line-height: 1.1;
-        }
-
-        #mv3d-root .mv-popup-close {
-          background: var(--mv-surface2); border: 1px solid var(--mv-border2);
-          color: var(--mv-text3); cursor: pointer;
-          width: 22px; height: 22px;
-          border-radius: var(--mv-radius);
-          font-size: 0.65rem; display: flex;
-          align-items: center; justify-content: center;
-          flex-shrink: 0; transition: all 0.15s; margin-left: 8px;
-        }
-
-        #mv3d-root .mv-popup-close:hover { border-color: var(--mv-accent); color: var(--mv-accent2); }
-
-        #mv3d-root .mv-popup-div {
-          height: 1px;
-          background: linear-gradient(90deg, var(--mv-accent), transparent);
-          margin: 10px 0;
-        }
-
-        #mv3d-root .mv-popup-desc {
-          font-size: 0.62rem; color: var(--mv-text2);
-          line-height: 1.8; margin-bottom: 14px; font-weight: 300;
-        }
-
-        #mv3d-root .mv-popup-specs {
-          display: grid; grid-template-columns: 1fr 1fr; gap: 9px;
-        }
-
-        #mv3d-root .mv-spec-label {
-          font-size: 0.5rem; font-weight: 400; color: var(--mv-text3);
-          text-transform: uppercase; letter-spacing: 0.14em;
-        }
-
-        #mv3d-root .mv-spec-value {
-          font-size: 0.65rem; color: var(--mv-accent2);
-          font-weight: 400; margin-top: 3px;
-        }
-
-        /* ── Loading screen ── */
-        #mv3d-root .mv-loading {
-          position: absolute; inset: 0;
-          background: var(--mv-bg);
-          display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          z-index: 200; transition: opacity 0.5s;
-        }
-
-        #mv3d-root .mv-loading.done { opacity: 0; pointer-events: none; }
-
-        #mv3d-root .mv-loading-title {
-          font-family: 'Rajdhani', sans-serif;
-          font-weight: 700; font-size: 1.9rem;
-          color: var(--mv-text); letter-spacing: 0.25em; text-transform: uppercase;
-        }
-
-        #mv3d-root .mv-loading-title span { color: var(--mv-accent2); }
-
-        #mv3d-root .mv-loading-sub {
-          font-size: 0.55rem; color: var(--mv-text3);
-          letter-spacing: 0.22em; text-transform: uppercase;
-          margin-top: 5px; margin-bottom: 28px;
-        }
-
-        #mv3d-root .mv-loading-bar-wrap {
-          width: 180px; height: 1px;
-          background: var(--mv-border2); overflow: hidden;
-        }
-
-        #mv3d-root .mv-loading-bar {
-          height: 100%;
-          background: linear-gradient(90deg, var(--mv-accent), var(--mv-accent2));
-          box-shadow: 0 0 10px var(--mv-accent);
-          animation: mv-load 1.6s cubic-bezier(0.4,0,0.2,1) forwards;
-        }
-
-        @keyframes mv-load { from { width:0% } to { width:100% } }
-
-        #mv3d-root .mv-loading-text {
-          font-size: 0.55rem; color: var(--mv-text3);
-          text-transform: uppercase; letter-spacing: 0.18em; margin-top: 12px;
-        }
-      </style>
-
-      <!-- ── HTML Structure ── -->
-      <div class="mv-header">
-        <div class="mv-logo">
-          <div class="mv-logo-dot"></div>
-          SYS_PREVIEW
-        </div>
-        <div class="mv-model-label">OBJECT // <span>FOOTBALL_HELMET.OBJ</span></div>
-        <div class="mv-header-btns">
-          <button class="mv-btn" id="mv-btn-wire" onclick="mv3d.toggleWireframe()">Wireframe</button>
-          <button class="mv-btn" onclick="mv3d.resetCamera()">Reset View</button>
-        </div>
-      </div>
-
-      <div class="mv-viewer" id="mv-viewer">
-        <canvas class="mv-canvas" id="mv-canvas"></canvas>
-        <div class="mv-scanline"></div>
-        <div class="mv-corner tl"></div>
-        <div class="mv-corner tr"></div>
-        <div class="mv-corner bl"></div>
-        <div class="mv-corner br"></div>
-
-        <div class="mv-hud">
-          <div class="mv-hud-label">Distance</div>
-          <div class="mv-hud-value" id="mv-hud-dist">—</div>
-          <div class="mv-hud-label" style="margin-top:5px">Azimuth</div>
-          <div class="mv-hud-value" id="mv-hud-az">—</div>
-          <div class="mv-hud-label" style="margin-top:5px">Elevation</div>
-          <div class="mv-hud-value" id="mv-hud-el">—</div>
-        </div>
-
-        <div class="mv-zoom">
-          <button class="mv-zoom-btn" onclick="mv3d.zoom(-1)">+</button>
-          <button class="mv-zoom-btn" onclick="mv3d.zoom(1)">−</button>
-          <button class="mv-zoom-btn" onclick="mv3d.resetCamera()" style="font-size:0.7rem">⊙</button>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="mv-sidebar">
-          <div class="mv-sb-head">
-            <div class="mv-sb-tag">Protective Equipment</div>
-            <div class="mv-sb-title">Football<br><span>Helmet</span></div>
-            <div class="mv-sb-sub">// Drag · Scroll · Click to inspect</div>
-          </div>
-
-          <div class="mv-sb-section">
-            <div class="mv-sb-section-label">Components</div>
-            <div id="mv-parts-list"></div>
-          </div>
-
-          <div class="mv-sb-controls">
-            <div class="mv-sb-section-label">View Options</div>
-            <button class="mv-ctrl-btn" id="mv-ctrl-wire" onclick="mv3d.toggleWireframe()">
-              <span class="mv-ctrl-icon">◻</span> Wireframe
-            </button>
-            <button class="mv-ctrl-btn" onclick="mv3d.resetCamera()">
-              <span class="mv-ctrl-icon">↺</span> Reset Camera
-            </button>
-          </div>
-
-          <div class="mv-sb-footer">
-            <div class="mv-hint-row"><span class="mv-hint-label">Orbit</span><span class="mv-hint-val">Left Drag</span></div>
-            <div class="mv-hint-row"><span class="mv-hint-label">Zoom</span><span class="mv-hint-val">Scroll / Pinch</span></div>
-            <div class="mv-hint-row"><span class="mv-hint-label">Pan</span><span class="mv-hint-val">Right Drag</span></div>
-            <div class="mv-hint-row"><span class="mv-hint-label">Inspect</span><span class="mv-hint-val">Click Part</span></div>
-          </div>
-        </div>
-
-        <!-- Popup -->
-        <div class="mv-popup hidden" id="mv-popup">
-          <div class="mv-popup-hdr">
-            <div>
-              <div class="mv-popup-tag"  id="mv-popup-tag"></div>
-              <div class="mv-popup-name" id="mv-popup-name"></div>
-            </div>
-            <button class="mv-popup-close" onclick="mv3d.closePopup()">✕</button>
-          </div>
-          <div class="mv-popup-div"></div>
-          <div class="mv-popup-desc"  id="mv-popup-desc"></div>
-          <div class="mv-popup-specs" id="mv-popup-specs"></div>
-        </div>
-
-        <!-- Loading -->
-        <div class="mv-loading" id="mv-loading">
-          <div class="mv-loading-title">Football <span>Helmet</span></div>
-          <div class="mv-loading-sub">// 3D Tech Preview</div>
-          <div class="mv-loading-bar-wrap"><div class="mv-loading-bar"></div></div>
-          <div class="mv-loading-text" id="mv-loading-text">Initializing...</div>
-        </div>
-      </div><!-- end .mv-viewer -->
-
-    </div><!-- end #mv3d-root -->
-
-  </div><!-- end .my-viewer-wrapper -->
-
-  <!-- ✂  END OF PASTE SEGMENT ══════════════════════════════════════════ -->
-
-
-  <!-- ═══════════════════════════════════════════════════════════════
-       SCRIPTS — paste these just before </body> in your page.
-       They only need to be included ONCE even if you use the viewer
-       multiple times.
-  ════════════════════════════════════════════════════════════════ -->
+  <!-- ═══════════════════════════════════════════════════════
+    SCRIPTS — include once, before </body>
+  ════════════════════════════════════════════════════════ -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/OBJLoader.js"></script>
 
   <script>
   /* ================================================================
-     3D VIEWER — self-contained init
-     All state lives inside the mv3d object so it never pollutes
-     your page's global scope.
+     createViewer(config)
+     ─────────────────────────────────────────────────────────────────
+     Injects a fully self-contained 3D viewer into any container div.
+     Each instance is completely isolated — styles, state, and IDs
+     are all scoped to a unique generated key.
+
+     CONFIG OPTIONS:
+       containerId  — id of the <div> to inject into             (required)
+       objFile      — path to your .obj file                     (required)
+       title        — model display name in sidebar              (required)
+       tag          — category label shown above title           (required)
+       parts        — array of part definitions (see below)      (required)
+       camDist      — initial camera distance   (default: 22)    (optional)
+       camAz        — initial azimuth in rad    (default: 0.3)   (optional)
+       camEl        — initial elevation in rad  (default: 0.18)  (optional)
+
+     PART DEFINITION:
+       {
+         id:       'MeshNameInOBJ',   // must match "o" or "g" name in .obj
+         name:     'Display Name',
+         tag:      'Category',
+         color:    0x0a4488,          // hex colour
+         emissive: 0x020d22,          // hex emissive (darker version of color)
+         desc:     'Description text shown in popup.',
+         specs:    { Key: 'Value', Key2: 'Value2' },
+         dotColor: '#0a84ff',         // CSS colour for the sidebar dot
+       }
   ================================================================ */
-  const mv3d = (() => {
+  function createViewer(config) {
+    const {
+      containerId,
+      objFile,
+      title      = 'Model',
+      tag        = 'Object',
+      parts      = [],
+      camDist: initDist = 22,
+      camAz:   initAz   = 0.3,
+      camEl:   initEl   = 0.18,
+    } = config;
 
-    /* ── PART DEFINITIONS ─────────────────────────────────────────
-       id must match the mesh/group name inside your OBJ file.
-       Look for lines starting with "o" or "g" in the .obj file.
-    ──────────────────────────────────────────────────────────── */
-    const PARTS = [
-      {
-        id:       '10503_Football_helmet_v1_SG', /* ← OBJ mesh name */
-        name:     'Football Helmet',
-        tag:      'Protective Gear',
-        color:    0x0a4488,
-        emissive: 0x020d22,
-        desc:     'Full American football helmet with integrated face mask and chin strap. Engineered for maximum impact absorption and optimal player visibility.',
-        specs:    { Standard: 'NOCSAE', Shell: 'Polycarbonate', Padding: 'TPU Foam', Weight: '~2.0 kg' },
-        dotColor: '#0a84ff',
-      },
-      /* ADD MORE PARTS HERE — each id must match a mesh name in the OBJ */
-    ];
+    const container = document.getElementById(containerId);
+    if (!container) { console.error(`createViewer: no element with id "${containerId}"`); return; }
 
-    /* ── SCENE SETUP ──────────────────────────────────────────── */
-    const canvas   = document.getElementById('mv-canvas');
+    /* Unique key so IDs and CSS never clash between instances */
+    const uid = 'mv_' + Math.random().toString(36).slice(2, 8);
+
+    /* ── Inject HTML ───────────────────────────────────────── */
+    container.innerHTML = `
+      <div id="${uid}_root" style="width:100%;height:100%;display:flex;flex-direction:column;overflow:hidden;position:relative;font-family:'JetBrains Mono',monospace;font-weight:300;background:#020810;color:#e2eeff;">
+
+        <!-- Header -->
+        <div id="${uid}_header" style="display:flex;align-items:center;justify-content:space-between;padding:0 20px;height:48px;flex-shrink:0;background:#060f1e;border-bottom:1px solid #1a3a6a;position:relative;z-index:10;">
+          <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#0a84ff,#00d4ff,#0a84ff,transparent);"></div>
+          <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;letter-spacing:0.2em;text-transform:uppercase;color:#e2eeff;display:flex;align-items:center;gap:8px;">
+            <div id="${uid}_dot" style="width:6px;height:6px;background:#0a84ff;border-radius:50%;box-shadow:0 0 10px rgba(10,132,255,0.7);"></div>
+            SYS_PREVIEW
+          </div>
+          <div style="font-size:0.58rem;color:#344d72;letter-spacing:0.1em;text-transform:uppercase;">
+            OBJECT // <span style="color:#00d4ff;">${objFile.split('/').pop().toUpperCase()}</span>
+          </div>
+          <div style="display:flex;gap:5px;">
+            <button id="${uid}_btn_wire" onclick="window['${uid}'].toggleWireframe()" style="background:transparent;border:1px solid #1a3a6a;color:#6b8ab5;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:0.56rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.1em;border-radius:2px;transition:all 0.15s;">Wireframe</button>
+            <button onclick="window['${uid}'].resetCamera()" style="background:transparent;border:1px solid #1a3a6a;color:#6b8ab5;padding:4px 10px;font-family:'JetBrains Mono',monospace;font-size:0.56rem;cursor:pointer;text-transform:uppercase;letter-spacing:0.1em;border-radius:2px;transition:all 0.15s;">Reset</button>
+          </div>
+        </div>
+
+        <!-- Viewer area -->
+        <div id="${uid}_viewer" style="flex:1;position:relative;overflow:hidden;">
+
+          <!-- Grid background -->
+          <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(10,132,255,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(10,132,255,0.06) 1px,transparent 1px);background-size:44px 44px;pointer-events:none;z-index:0;"></div>
+          <!-- Radial vignette -->
+          <div style="position:absolute;inset:0;background:radial-gradient(ellipse 65% 65% at 42% 50%,rgba(10,132,255,0.05) 0%,transparent 70%),radial-gradient(ellipse 100% 100% at 50% 50%,transparent 55%,rgba(2,8,16,0.85) 100%);pointer-events:none;z-index:1;"></div>
+
+          <canvas id="${uid}_canvas" style="display:block;width:100%;height:100%;cursor:grab;position:relative;z-index:2;"></canvas>
+
+          <!-- Scanline sweep -->
+          <div style="position:absolute;left:0;width:calc(100% - 250px);height:1px;background:linear-gradient(90deg,transparent,rgba(10,132,255,0.35),transparent);pointer-events:none;z-index:3;opacity:0.5;animation:mv_scan_${uid} 6s linear infinite;"></div>
+          <style>@keyframes mv_scan_${uid}{0%{top:0%;opacity:0}5%{opacity:0.5}95%{opacity:0.5}100%{top:100%;opacity:0}}</style>
+
+          <!-- Corner brackets -->
+          <div style="position:absolute;top:7px;left:7px;width:16px;height:16px;border-top:1px solid #0a84ff;border-left:1px solid #0a84ff;pointer-events:none;z-index:3;"></div>
+          <div style="position:absolute;top:7px;right:257px;width:16px;height:16px;border-top:1px solid #0a84ff;border-right:1px solid #0a84ff;pointer-events:none;z-index:3;"></div>
+          <div style="position:absolute;bottom:7px;left:7px;width:16px;height:16px;border-bottom:1px solid #0a84ff;border-left:1px solid #0a84ff;pointer-events:none;z-index:3;"></div>
+          <div style="position:absolute;bottom:7px;right:257px;width:16px;height:16px;border-bottom:1px solid #0a84ff;border-right:1px solid #0a84ff;pointer-events:none;z-index:3;"></div>
+
+          <!-- HUD -->
+          <div style="position:absolute;top:14px;left:14px;pointer-events:none;z-index:5;">
+            <div style="font-size:0.5rem;color:#344d72;text-transform:uppercase;letter-spacing:0.14em;line-height:2;">Distance</div>
+            <div id="${uid}_hud_dist" style="font-size:0.6rem;color:#00d4ff;font-weight:400;">—</div>
+            <div style="font-size:0.5rem;color:#344d72;text-transform:uppercase;letter-spacing:0.14em;line-height:2;margin-top:4px;">Azimuth</div>
+            <div id="${uid}_hud_az" style="font-size:0.6rem;color:#00d4ff;font-weight:400;">—</div>
+          </div>
+
+          <!-- Zoom controls -->
+          <div style="position:absolute;left:14px;bottom:18px;display:flex;gap:4px;z-index:5;">
+            <button onclick="window['${uid}'].zoom(-1)" style="width:28px;height:28px;background:#060f1e;border:1px solid #1a3a6a;color:#6b8ab5;font-size:0.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:2px;font-family:'JetBrains Mono',monospace;transition:all 0.15s;">+</button>
+            <button onclick="window['${uid}'].zoom(1)"  style="width:28px;height:28px;background:#060f1e;border:1px solid #1a3a6a;color:#6b8ab5;font-size:0.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:2px;font-family:'JetBrains Mono',monospace;transition:all 0.15s;">−</button>
+            <button onclick="window['${uid}'].resetCamera()" style="width:28px;height:28px;background:#060f1e;border:1px solid #1a3a6a;color:#6b8ab5;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:2px;font-family:'JetBrains Mono',monospace;transition:all 0.15s;">⊙</button>
+          </div>
+
+          <!-- Sidebar -->
+          <div style="position:absolute;right:0;top:0;bottom:0;width:250px;background:#060f1e;border-left:1px solid #1a3a6a;display:flex;flex-direction:column;z-index:5;overflow-y:auto;">
+            <!-- Sidebar left glow line -->
+            <div style="position:absolute;top:0;left:-1px;bottom:0;width:1px;background:linear-gradient(180deg,transparent,#0a84ff,#00d4ff,#0a84ff,transparent);"></div>
+
+            <!-- Sidebar header -->
+            <div style="padding:20px 18px 16px;border-bottom:1px solid #0e2040;">
+              <div style="font-size:0.52rem;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:#0a84ff;margin-bottom:8px;display:flex;align-items:center;gap:7px;">
+                <span style="display:inline-block;width:10px;height:1px;background:#0a84ff;box-shadow:0 0 8px rgba(10,132,255,0.6);"></span>
+                ${tag}
+              </div>
+              <div style="font-family:'Rajdhani',sans-serif;font-size:1.6rem;font-weight:700;color:#e2eeff;line-height:1.1;letter-spacing:0.04em;text-transform:uppercase;">${title.replace('\n','<br>')}</div>
+              <div style="font-size:0.55rem;color:#344d72;margin-top:7px;letter-spacing:0.08em;">// Drag · Scroll · Click to inspect</div>
+            </div>
+
+            <!-- Parts list -->
+            <div style="padding:14px 18px;border-bottom:1px solid #0e2040;">
+              <div style="font-size:0.5rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:#344d72;margin-bottom:9px;">Components</div>
+              <div id="${uid}_parts_list"></div>
+            </div>
+
+            <!-- Controls -->
+            <div style="padding:14px 18px;display:flex;flex-direction:column;gap:6px;">
+              <div style="font-size:0.5rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:#344d72;margin-bottom:4px;">View Options</div>
+              <button id="${uid}_ctrl_wire" onclick="window['${uid}'].toggleWireframe()" style="display:flex;align-items:center;gap:8px;padding:7px 11px;background:#0a1628;border:1px solid #1a3a6a;border-radius:2px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:#6b8ab5;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.15s;text-align:left;">
+                <span style="color:#0a84ff;font-size:0.8rem;">◻</span> Wireframe
+              </button>
+              <button onclick="window['${uid}'].resetCamera()" style="display:flex;align-items:center;gap:8px;padding:7px 11px;background:#0a1628;border:1px solid #1a3a6a;border-radius:2px;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:0.56rem;color:#6b8ab5;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.15s;text-align:left;">
+                <span style="color:#0a84ff;font-size:0.8rem;">↺</span> Reset Camera
+              </button>
+            </div>
+
+            <!-- Footer hints -->
+            <div style="margin-top:auto;padding:12px 18px;border-top:1px solid #0e2040;">
+              ${[['Orbit','Left Drag'],['Zoom','Scroll'],['Pan','Right Drag'],['Inspect','Click Part']].map(([l,v])=>`
+              <div style="display:flex;justify-content:space-between;padding:3px 0;">
+                <span style="font-size:0.5rem;color:#344d72;letter-spacing:0.1em;text-transform:uppercase;">${l}</span>
+                <span style="font-size:0.52rem;color:#6b8ab5;">${v}</span>
+              </div>`).join('')}
+            </div>
+          </div>
+
+          <!-- Info popup -->
+          <div id="${uid}_popup" style="position:absolute;background:#060f1e;border:1px solid #0a84ff;padding:16px;width:245px;pointer-events:all;box-shadow:0 0 24px rgba(10,132,255,0.25),0 0 60px rgba(10,132,255,0.1),0 24px 80px rgba(0,0,0,0.7);border-radius:2px;transition:all 0.2s cubic-bezier(0.16,1,0.3,1);z-index:100;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);opacity:0;transform:scale(0.94) translateY(8px);pointer-events:none;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px;">
+              <div>
+                <div id="${uid}_popup_tag"  style="font-size:0.5rem;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:#0a84ff;margin-bottom:4px;"></div>
+                <div id="${uid}_popup_name" style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.15rem;color:#e2eeff;letter-spacing:0.06em;text-transform:uppercase;line-height:1.1;"></div>
+              </div>
+              <button onclick="window['${uid}'].closePopup()" style="background:#0a1628;border:1px solid #1a3a6a;color:#344d72;cursor:pointer;width:20px;height:20px;border-radius:2px;font-size:0.6rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:8px;transition:all 0.15s;">✕</button>
+            </div>
+            <div style="height:1px;background:linear-gradient(90deg,#0a84ff,transparent);margin:10px 0;"></div>
+            <div id="${uid}_popup_desc"  style="font-size:0.6rem;color:#6b8ab5;line-height:1.8;margin-bottom:13px;font-weight:300;"></div>
+            <div id="${uid}_popup_specs" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
+          </div>
+
+          <!-- Loading screen -->
+          <div id="${uid}_loading" style="position:absolute;inset:0;background:#020810;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;transition:opacity 0.5s;">
+            <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.7rem;color:#e2eeff;letter-spacing:0.25em;text-transform:uppercase;">${title.replace('\n',' ').replace('<br>',' ')}</div>
+            <div style="font-size:0.55rem;color:#344d72;letter-spacing:0.2em;text-transform:uppercase;margin-top:5px;margin-bottom:24px;">// Loading 3D Model</div>
+            <div style="width:160px;height:1px;background:#1a3a6a;overflow:hidden;">
+              <div style="height:100%;background:linear-gradient(90deg,#0a84ff,#00d4ff);box-shadow:0 0 10px #0a84ff;animation:mv_load_${uid} 1.6s cubic-bezier(0.4,0,0.2,1) forwards;"></div>
+            </div>
+            <style>@keyframes mv_load_${uid}{from{width:0%}to{width:100%}}</style>
+            <div id="${uid}_load_txt" style="font-size:0.52rem;color:#344d72;text-transform:uppercase;letter-spacing:0.18em;margin-top:11px;">Initializing...</div>
+          </div>
+
+        </div><!-- end viewer area -->
+      </div><!-- end root -->
+    `;
+
+    /* ── Three.js init ─────────────────────────────────────── */
+    const canvas   = document.getElementById(`${uid}_canvas`);
     const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled   = true;
@@ -638,45 +278,43 @@
 
     const scene  = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 500);
-    let camDist = 22, camAz = 0.3, camEl = 0.18;
+    let camDist = initDist, camAz = initAz, camEl = initEl;
     let camTarget = new THREE.Vector3(0, 0, 0);
 
-    /* Lights */
     scene.add(new THREE.AmbientLight(0x0a1a3a, 1.2));
     const kl = new THREE.DirectionalLight(0xd0e8ff, 3.0);
     kl.position.set(5, 14, 9); kl.castShadow = true;
     kl.shadow.mapSize.width = kl.shadow.mapSize.height = 2048;
     kl.shadow.bias = -0.001; scene.add(kl);
-    const fl = new THREE.DirectionalLight(0x0a84ff, 1.4);
-    fl.position.set(-9, 3, 5); scene.add(fl);
-    const rl = new THREE.DirectionalLight(0x00d4ff, 0.9);
-    rl.position.set(2, -4, -10); scene.add(rl);
-    const pl = new THREE.PointLight(0x1a5eff, 0.6, 30);
-    pl.position.set(0, 0, 6); scene.add(pl);
-    const gm = new THREE.Mesh(new THREE.PlaneGeometry(40,40), new THREE.ShadowMaterial({ opacity: 0.25 }));
-    gm.rotation.x = -Math.PI/2; gm.position.y = -7; gm.receiveShadow = true; scene.add(gm);
+    scene.add(Object.assign(new THREE.DirectionalLight(0x0a84ff, 1.4), { position: new THREE.Vector3(-9, 3, 5) }));
+    scene.add(Object.assign(new THREE.DirectionalLight(0x00d4ff, 0.9), { position: new THREE.Vector3(2, -4, -10) }));
+    scene.add(Object.assign(new THREE.PointLight(0x1a5eff, 0.6, 30), { position: new THREE.Vector3(0, 0, 6) }));
+    const gnd = new THREE.Mesh(new THREE.PlaneGeometry(40,40), new THREE.ShadowMaterial({ opacity: 0.25 }));
+    gnd.rotation.x = -Math.PI/2; gnd.position.y = -7; gnd.receiveShadow = true; scene.add(gnd);
 
-    /* ── LOAD MODEL ───────────────────────────────────────────── */
-    const modelGroup  = new THREE.Group(); scene.add(modelGroup);
-    const meshes      = {};
+    /* ── Load model ────────────────────────────────────────── */
+    const modelGroup   = new THREE.Group(); scene.add(modelGroup);
+    const meshes       = {};
     const partMeshList = [];
 
     new THREE.OBJLoader().load(
-      'helmet.obj',          /* ← YOUR OBJ FILENAME HERE */
+      objFile,
       (obj) => {
-        const rawBox = new THREE.Box3().setFromObject(obj);
-        const rawSize = new THREE.Vector3(); rawBox.getSize(rawSize);
-        obj.scale.setScalar(10 / Math.max(rawSize.x, rawSize.y, rawSize.z));
+        const rb = new THREE.Box3().setFromObject(obj);
+        const rs = new THREE.Vector3(); rb.getSize(rs);
+        obj.scale.setScalar(10 / Math.max(rs.x, rs.y, rs.z));
         modelGroup.add(obj);
-        const box = new THREE.Box3().setFromObject(modelGroup);
-        const centre = new THREE.Vector3(); box.getCenter(centre);
-        modelGroup.position.sub(centre);
+        const b = new THREE.Box3().setFromObject(modelGroup);
+        const c = new THREE.Vector3(); b.getCenter(c);
+        modelGroup.position.sub(c);
 
         obj.traverse(child => {
           if (!child.isMesh) return;
-          const p = PARTS.find(x => x.id === child.name) || PARTS[0];
+          const p = parts.find(x => x.id === child.name) || parts[0];
+          if (!p) return;
           child.material = new THREE.MeshStandardMaterial({
-            color: new THREE.Color(p.color), emissive: new THREE.Color(p.emissive),
+            color: new THREE.Color(p.color),
+            emissive: new THREE.Color(p.emissive),
             metalness: 0.18, roughness: 0.52
           });
           child.castShadow = child.receiveShadow = true;
@@ -684,43 +322,51 @@
           partMeshList.push({ mesh: child, partId: p.id });
           if (!meshes[p.id]) meshes[p.id] = child;
         });
-        buildUI();
+        buildPartsUI();
         dismissLoading();
       },
       (xhr) => {
-        const el = document.getElementById('mv-loading-text');
-        if (el && xhr.total) el.textContent = `Loading... ${Math.round(xhr.loaded/xhr.total*100)}%`;
+        const el = document.getElementById(`${uid}_load_txt`);
+        if (el && xhr.total) el.textContent = `Loading... ${Math.round(xhr.loaded / xhr.total * 100)}%`;
       },
       (err) => {
-        const el = document.getElementById('mv-loading-text');
+        const el = document.getElementById(`${uid}_load_txt`);
         if (el) el.textContent = 'Error — check filename & path.';
-        console.error(err);
+        console.error(`[${uid}] OBJ load error:`, err);
       }
     );
 
-    /* ── UI ───────────────────────────────────────────────────── */
-    function buildUI() {
-      const list = document.getElementById('mv-parts-list');
+    /* ── Parts UI ──────────────────────────────────────────── */
+    function buildPartsUI() {
+      const list = document.getElementById(`${uid}_parts_list`);
       list.innerHTML = '';
-      PARTS.forEach(p => {
+      parts.forEach(p => {
         const d = document.createElement('div');
-        d.className = 'mv-part-item'; d.id = 'mv-pi-' + p.id;
-        d.innerHTML = `<div class="mv-part-dot" style="background:${p.dotColor}"></div><div class="mv-part-name">${p.name}</div>`;
+        d.id = `${uid}_pi_${p.id}`;
+        d.style.cssText = 'display:flex;align-items:center;gap:8px;padding:6px 8px;cursor:pointer;border-radius:2px;border:1px solid transparent;transition:all 0.15s;margin-bottom:3px;';
+        d.innerHTML = `
+          <div style="width:6px;height:6px;border-radius:50%;background:${p.dotColor};flex-shrink:0;"></div>
+          <div style="font-size:0.62rem;font-weight:400;color:#e2eeff;letter-spacing:0.06em;text-transform:uppercase;">${p.name}</div>
+        `;
+        d.onmouseenter = () => { if (!d.dataset.selected) d.style.background = '#0d1f38'; };
+        d.onmouseleave = () => { if (!d.dataset.selected) d.style.background = 'transparent'; };
         d.onclick = () => selectPart(p.id);
         list.appendChild(d);
       });
     }
 
-    /* ── RAYCASTING ───────────────────────────────────────────── */
+    /* ── Raycasting ────────────────────────────────────────── */
     const raycaster = new THREE.Raycaster();
+    let isDragging = false, isRightDrag = false;
+    let lastX = 0, lastY = 0;
     let mouseMovedAfterDown = false;
-    let isDragging = false, isRightDrag = false, lastX = 0, lastY = 0;
 
     canvas.addEventListener('mousedown', e => {
       isDragging = true; isRightDrag = e.button === 2;
       lastX = e.clientX; lastY = e.clientY;
       mouseMovedAfterDown = false;
     });
+    canvas.addEventListener('contextmenu', e => e.preventDefault());
     canvas.addEventListener('mousemove', e => {
       if (!isDragging) return;
       mouseMovedAfterDown = true;
@@ -737,22 +383,6 @@
       lastX = e.clientX; lastY = e.clientY;
     });
     window.addEventListener('mouseup', () => { isDragging = false; });
-    canvas.addEventListener('contextmenu', e => e.preventDefault());
-
-    canvas.addEventListener('click', e => {
-      if (mouseMovedAfterDown) return;
-      const rect = canvas.getBoundingClientRect();
-      const mouse = new THREE.Vector2(
-        ((e.clientX - rect.left) / rect.width) * 2 - 1,
-        ((e.clientY - rect.top)  / rect.height) * -2 + 1
-      );
-      raycaster.setFromCamera(mouse, camera);
-      const hits = raycaster.intersectObjects(partMeshList.map(p => p.mesh), true);
-      if (hits.length > 0 && hits[0].object.userData.partId) {
-        selectPart(hits[0].object.userData.partId, e.clientX, e.clientY);
-      } else { deselectAll(); }
-    });
-
     canvas.addEventListener('wheel', e => {
       e.preventDefault();
       camDist = Math.max(3, Math.min(80, camDist + e.deltaY * 0.04));
@@ -766,8 +396,8 @@
     canvas.addEventListener('touchmove', e => {
       e.preventDefault();
       if (e.touches.length === 1 && isDragging) {
-        const dx = e.touches[0].clientX - lastX, dy = e.touches[0].clientY - lastY;
-        camAz -= dx * 0.007; camEl = Math.max(-1.3, Math.min(1.3, camEl - dy * 0.007));
+        camAz -= (e.touches[0].clientX - lastX) * 0.007;
+        camEl = Math.max(-1.3, Math.min(1.3, camEl - (e.touches[0].clientY - lastY) * 0.007));
         lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
       } else if (e.touches.length === 2) {
         const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
@@ -777,7 +407,20 @@
     }, { passive: false });
     canvas.addEventListener('touchend', () => { isDragging = false; });
 
-    /* ── SELECTION ────────────────────────────────────────────── */
+    canvas.addEventListener('click', e => {
+      if (mouseMovedAfterDown) return;
+      const rect = canvas.getBoundingClientRect();
+      raycaster.setFromCamera(new THREE.Vector2(
+        ((e.clientX - rect.left) / rect.width) * 2 - 1,
+        ((e.clientY - rect.top)  / rect.height) * -2 + 1
+      ), camera);
+      const hits = raycaster.intersectObjects(partMeshList.map(p => p.mesh), true);
+      if (hits.length > 0 && hits[0].object.userData.partId) {
+        selectPart(hits[0].object.userData.partId, e.clientX, e.clientY);
+      } else { deselectAll(); }
+    });
+
+    /* ── Selection & popup ─────────────────────────────────── */
     let selectedPart = null;
 
     function selectPart(partId, cx, cy) {
@@ -788,50 +431,59 @@
         mesh.material.emissive.setHex(0x003a88);
         mesh.material.emissiveIntensity = 2.0;
       });
-      document.getElementById('mv-pi-' + partId)?.classList.add('selected');
-      const p = PARTS.find(x => x.id === partId);
+      const piEl = document.getElementById(`${uid}_pi_${partId}`);
+      if (piEl) {
+        piEl.dataset.selected = '1';
+        piEl.style.background = 'rgba(10,132,255,0.1)';
+        piEl.style.borderColor = '#0a84ff';
+      }
+      const p = parts.find(x => x.id === partId);
       if (p) showPopup(p, cx, cy);
     }
 
     function deselectAll() {
       if (selectedPart) {
-        const p = PARTS.find(x => x.id === selectedPart);
+        const p = parts.find(x => x.id === selectedPart);
         partMeshList.forEach(({ mesh, partId: pid }) => {
           if (pid !== selectedPart) return;
           mesh.material.emissive.setHex(p ? p.emissive : 0);
           mesh.material.emissiveIntensity = 1;
         });
+        const piEl = document.getElementById(`${uid}_pi_${selectedPart}`);
+        if (piEl) { delete piEl.dataset.selected; piEl.style.background = 'transparent'; piEl.style.borderColor = 'transparent'; }
       }
-      document.querySelectorAll('#mv3d-root .mv-part-item').forEach(el => el.classList.remove('selected'));
       selectedPart = null;
       closePopup();
     }
 
     function showPopup(p, cx, cy) {
-      const popup = document.getElementById('mv-popup');
-      document.getElementById('mv-popup-tag').textContent  = p.tag;
-      document.getElementById('mv-popup-name').textContent = p.name;
-      document.getElementById('mv-popup-desc').textContent = p.desc;
-      const specs = document.getElementById('mv-popup-specs');
+      const popup = document.getElementById(`${uid}_popup`);
+      document.getElementById(`${uid}_popup_tag`).textContent  = p.tag;
+      document.getElementById(`${uid}_popup_name`).textContent = p.name;
+      document.getElementById(`${uid}_popup_desc`).textContent = p.desc;
+      const specs = document.getElementById(`${uid}_popup_specs`);
       specs.innerHTML = '';
-      Object.entries(p.specs).forEach(([k, v]) => {
-        specs.innerHTML += `<div><div class="mv-spec-label">${k}</div><div class="mv-spec-value">${v}</div></div>`;
+      Object.entries(p.specs || {}).forEach(([k, v]) => {
+        specs.innerHTML += `<div><div style="font-size:0.48rem;color:#344d72;text-transform:uppercase;letter-spacing:0.14em;">${k}</div><div style="font-size:0.62rem;color:#00d4ff;margin-top:3px;">${v}</div></div>`;
       });
-      const vr = document.getElementById('mv-viewer').getBoundingClientRect();
-      let x = cx !== undefined ? cx - vr.left + 14 : 150;
-      let y = cy !== undefined ? cy - vr.top  - 36 : 150;
-      x = Math.max(8, Math.min(x, vr.width - 275));
-      y = Math.max(8, Math.min(y, vr.height - 290));
+      const vr = document.getElementById(`${uid}_viewer`).getBoundingClientRect();
+      let x = cx !== undefined ? cx - vr.left + 12 : 150;
+      let y = cy !== undefined ? cy - vr.top  - 34 : 150;
+      x = Math.max(8, Math.min(x, vr.width - 265));
+      y = Math.max(8, Math.min(y, vr.height - 280));
       popup.style.left = x + 'px'; popup.style.top = y + 'px';
-      popup.classList.remove('hidden');
+      popup.style.opacity = '1'; popup.style.transform = 'scale(1) translateY(0)'; popup.style.pointerEvents = 'all';
     }
 
-    function closePopup() { document.getElementById('mv-popup').classList.add('hidden'); }
+    function closePopup() {
+      const popup = document.getElementById(`${uid}_popup`);
+      popup.style.opacity = '0'; popup.style.transform = 'scale(0.94) translateY(8px)'; popup.style.pointerEvents = 'none';
+    }
 
-    /* ── RESIZE & RENDER ──────────────────────────────────────── */
+    /* ── Resize & render loop ──────────────────────────────── */
     function resize() {
-      const viewer = document.getElementById('mv-viewer');
-      const w = viewer.clientWidth - 260;
+      const viewer = document.getElementById(`${uid}_viewer`);
+      const w = viewer.clientWidth - 250;
       const h = viewer.clientHeight;
       renderer.setSize(w, h);
       camera.aspect = w / h;
@@ -840,51 +492,113 @@
     window.addEventListener('resize', resize);
     resize();
 
-    function updateCamera() {
+    (function animate() {
+      requestAnimationFrame(animate);
       const x = camDist * Math.cos(camEl) * Math.sin(camAz);
       const y = camDist * Math.sin(camEl);
       const z = camDist * Math.cos(camEl) * Math.cos(camAz);
       camera.position.set(x + camTarget.x, y + camTarget.y, z + camTarget.z);
       camera.lookAt(camTarget);
-      const d = document.getElementById('mv-hud-dist');
-      const a = document.getElementById('mv-hud-az');
-      const e = document.getElementById('mv-hud-el');
+      const d = document.getElementById(`${uid}_hud_dist`);
+      const a = document.getElementById(`${uid}_hud_az`);
       if (d) d.textContent = camDist.toFixed(1);
       if (a) a.textContent = (camAz * 180 / Math.PI).toFixed(1) + '°';
-      if (e) e.textContent = (camEl * 180 / Math.PI).toFixed(1) + '°';
-    }
-
-    (function animate() {
-      requestAnimationFrame(animate);
-      updateCamera();
       renderer.render(scene, camera);
     })();
 
     function dismissLoading() {
-      const el = document.getElementById('mv-loading');
+      const el = document.getElementById(`${uid}_loading`);
       if (!el) return;
-      el.classList.add('done');
+      el.style.opacity = '0'; el.style.pointerEvents = 'none';
       setTimeout(() => el.remove(), 600);
     }
 
-    /* ── WIREFRAME ────────────────────────────────────────────── */
+    /* ── Wireframe ─────────────────────────────────────────── */
     let wireframeOn = false;
     function toggleWireframe() {
       wireframeOn = !wireframeOn;
-      document.getElementById('mv-btn-wire') ?.classList.toggle('active', wireframeOn);
-      document.getElementById('mv-ctrl-wire')?.classList.toggle('active', wireframeOn);
+      const bw = document.getElementById(`${uid}_btn_wire`);
+      const cw = document.getElementById(`${uid}_ctrl_wire`);
+      const on = 'background:rgba(10,132,255,0.12);border-color:#0a84ff;color:#00d4ff;';
+      const off = 'background:transparent;border-color:#1a3a6a;color:#6b8ab5;';
+      if (bw) bw.style.cssText += wireframeOn ? on : off;
+      if (cw) cw.style.cssText += wireframeOn ? on : off;
       partMeshList.forEach(({ mesh }) => { mesh.material.wireframe = wireframeOn; });
     }
 
-    /* ── PUBLIC API ───────────────────────────────────────────── */
-    return {
+    /* ── Public API exposed on window[uid] ─────────────────── */
+    window[uid] = {
       zoom(dir)        { camDist = Math.max(3, Math.min(80, camDist + dir * 2.5)); },
-      resetCamera()    { camDist = 22; camAz = 0.3; camEl = 0.18; camTarget.set(0,0,0); },
+      resetCamera()    { camDist = initDist; camAz = initAz; camEl = initEl; camTarget.set(0,0,0); },
       toggleWireframe,
       closePopup,
     };
+  }
 
-  })();
+
+  /* ================================================================
+     INSTANTIATE VIEWERS
+     ─────────────────────────────────────────────────────────────
+     Call createViewer() once for each viewer slot on your page.
+     - containerId must match the id of your <div> wrapper
+     - objFile is the path to your .obj (relative to the HTML file)
+     - parts: each id must match a mesh name inside your .obj
+       (open the .obj in a text editor, look for lines starting
+        with "o" or "g" — those are the mesh names)
+  ================================================================ */
+
+  /* ── Viewer 1: Football Helmet ─────────────────────────── */
+  createViewer({
+    containerId: 'viewer-A',
+    objFile:     'helmet.obj',          /* ← your .obj filename */
+    title:       'Football\nHelmet',
+    tag:         'Protective Equipment',
+    parts: [
+      {
+        id:       '10503_Football_helmet_v1_SG', /* ← mesh name in OBJ */
+        name:     'Football Helmet',
+        tag:      'Protective Gear',
+        color:    0x0a4488,
+        emissive: 0x020d22,
+        desc:     'Full American football helmet with integrated face mask and chin strap. Engineered for maximum impact absorption.',
+        specs:    { Standard: 'NOCSAE', Shell: 'Polycarbonate', Padding: 'TPU Foam', Weight: '~2.0 kg' },
+        dotColor: '#0a84ff',
+      },
+    ],
+  });
+
+  /* ── Viewer 2: Second Model ────────────────────────────── */
+  createViewer({
+    containerId: 'viewer-B',
+    objFile:     'helmet.obj',          /* ← swap with your second .obj */
+    title:       'Second\nModel',
+    tag:         'Your Category',
+    camAz:       -0.4,                  /* different starting angle */
+    parts: [
+      {
+        id:       '10503_Football_helmet_v1_SG', /* ← mesh name in OBJ */
+        name:     'Model Part',
+        tag:      'Structure',
+        color:    0x1a6a3a,             /* green tint for visual variety */
+        emissive: 0x021a0a,
+        desc:     'Replace this with your own model and part description.',
+        specs:    { Type: 'Custom', Material: 'Unknown', Scale: '1:1', Unit: 'Meters' },
+        dotColor: '#00d4aa',
+      },
+    ],
+  });
+
+  /* ── Add more viewers like this: ───────────────────────── */
+  /*
+  createViewer({
+    containerId: 'viewer-C',
+    objFile:     'my-model.obj',
+    title:       'My Model',
+    tag:         'Category',
+    parts: [ { id: 'MeshName', name: 'Part Name', tag: 'Tag', color: 0xff0000, emissive: 0x110000, desc: 'Description.', specs: { Key: 'Value' }, dotColor: '#ff0000' } ],
+  });
+  */
+
   </script>
 
 </body>
